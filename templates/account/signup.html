@@ -1,0 +1,209 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
+{% load i18n %} 
+{% load account socialaccount %}
+{% block head_title %}{% trans "Sign Up" %}{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="">   
+            <div class="text-center">       
+                <h1>{% trans "Sign Up" %}</h1>
+                <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}" class="btn-primary h4">sign in</a>.{% endblocktrans %}</p>
+            </div>
+            <div class="form-group">       
+                <form class="signup well form-horizontal" action="{% url 'account_signup' %}" method="post"  id="signup_form">{% csrf_token %}
+                        <fieldset> 
+                          {% for hidden_field in form.hidden_fields %}
+                          {{ hidden_field }}                    
+                        {% endfor %}
+                      
+                        {% if form.non_field_errors %}
+                          <div class="alert alert-danger" role="alert">
+                            {% for error in form.non_field_errors %}
+                              {{ error }}
+                            {% endfor %}
+                          </div>
+                        {% endif %}                       
+                      <div class="form-group">
+                              <label class="col-md-6 col-md-offset-3 control-label"> 
+                                {% if form.username.errors %}
+                                  <div class="alert alert-danger" role="alert">
+                                  {{ form.username.errors }}
+                                </div> 
+                                {%endif%}
+                              </label>
+                              <div class="col-md-6 col-md-offset-3 inputGroupContainer">
+                              <div class="input-group">
+                              <span class="input-group-addon">{{ form.username.label_tag }}*</span>
+                            {{ form.username|add_class:"form-control"}}
+                                  </div>
+                              {% if form.username.help_text %}
+                              <small class="form-text text-muted">{{form.username.help_text }}</small>
+                              {% endif %}
+                              </div>
+                      </div>                                      
+                           
+                        <div class="form-group">
+                                <label class="col-md-6 col-md-offset-3 control-label"> 
+                                    {% if form.first_name.errors %}
+                                      <div class="alert alert-danger" role="alert">
+                                      {{ form.first_name.errors }}
+                                    </div> 
+                                    {%endif%} 
+                                </label>
+                                <div class="col-md-6 col-md-offset-3 inputGroupContainer">
+                                <div class="input-group">
+                                <span class="input-group-addon">{{ form.first_name.label_tag }}*</i></span>
+                              {{ form.first_name|add_class:"form-control"}}
+                                    </div>
+                                {% if form.first_name.help_text %}
+                                <small class="form-text text-muted">{{form.first_name.help_text }}</small>
+                                {% endif %}
+                                </div>
+                        </div>
+                          
+                        <div class="form-group">
+                                <label class="col-md-6 col-md-offset-3 control-label">
+                                    {% if form.last_name.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                    {{ form.last_name.errors }}
+                                    </div> 
+                                    {%endif%}
+                                </label>  
+                                <div class="col-md-6 col-md-offset-3 inputGroupContainer">
+                                <div class="input-group">
+                                <span class="input-group-addon">{{ form.last_name.label_tag }}*</span>
+                                {{ form.last_name|add_class:"form-control"}}
+                                    </div>
+                                {% if form.last_name.help_text %}
+                                <small class="form-text text-muted">{{form.last_name.help_text }}</small>
+                                {% endif %}
+                                </div>
+                          </div>
+                          
+                        <div class="form-group">
+                                <label class="col-md-6 col-md-offset-3 control-label">
+                                    {% if form.email.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                      {{ form.email.errors }}
+                                    </div>
+                                     {%endif%}    
+                                </label>  
+                                <div class="col-md-6 col-md-offset-3 inputGroupContainer">
+                                <div class="input-group">
+                                <span class="input-group-addon">{{ form.email.label_tag }}*</span>
+                              {{ form.email|add_class:"form-control"}}
+                                    </div>
+                                {% if form.email.help_text %}
+                                <small class="form-text text-muted">{{form.email.help_text }}</small>
+                                {% endif %}
+                                </div>
+                        </div> 
+                            
+                        <div class="form-group">
+                                <label class="col-md-6 col-md-offset-3 control-label">
+                                    {% if form.phone_number.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                      {{ form.phone_number.errors }}
+                                    </div> 
+                                    {%endif%}
+                                </label>  
+                                <div class="col-md-6 col-md-offset-3 inputGroupContainer">
+                                <div class="input-group">
+                                <span class="input-group-addon">{{ form.phone_number.label_tag }}*</span>
+                              {{ form.phone_number|add_class:"form-control"}}
+                                    </div>
+                                {% if form.phone_number.help_text %}
+                                <small class="form-text text-muted">{{form.phone_number.help_text }}</small>
+                                {% endif %}
+                                </div>
+                        </div>  
+                          
+                        <div class="form-group">
+                                <label class="col-md-6 col-md-offset-3 control-label">
+                                    {% if form.gender.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                      {{ form.gender.errors }}
+                                    </div>
+                                     {%endif%} 
+                                </label>  
+                                <div class="col-md-6 col-md-offset-3 inputGroupContainer">
+                                <div class="input-group">
+                                <span class="input-group-addon">{{ form.gender.label_tag }}*</span>
+                              {{ form.gender|add_class:"form-control"}}
+                                    </div>
+                                {% if form.gender.help_text %}
+                                <small class="form-text text-muted">{{form.gender.help_text }}</small>
+                                {% endif %}
+                                </div>
+                        </div>         
+                              
+                        <div class="form-group">
+                                <label class="col-md-6 col-md-offset-3 control-label">
+                                    {% if form.password1.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                      {{ form.password1.errors }}
+                                    </div> 
+                                    {%endif%}
+                                </label>  
+                                <div class="col-md-6 col-md-offset-3 inputGroupContainer">
+                                <div class="input-group">
+                                <span class="input-group-addon">{{ form.password1.label_tag }}*</span>
+                              {{ form.password1|add_class:"form-control"}}
+                                    </div>
+                                {% if form.password1.help_text %}
+                                <small class="form-text text-muted">{{form.password1.help_text }}</small>
+                                {% endif %}
+                                </div>
+                        </div>
+                           
+                        <div class="form-group">
+                                <label class="col-md-6 col-md-offset-3 control-label">
+                                    {% if form.password2.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                      {{ form.password2.errors }}
+                                    </div>
+                                     {%endif%} 
+                                </label>  
+                                <div class="col-md-6 col-md-offset-3 inputGroupContainer">
+                                <div class="input-group">
+                                <span class="input-group-addon">{{ form.password2.label_tag }}*</i></span>
+                              {{ form.password2|add_class:"form-control"}}
+                                    </div>
+                                {% if form.password2.help_text %}
+                                <small class="form-text text-muted">{{form.password2.help_text }}</small>
+                                {% endif %}
+                                </div>
+                        </div>                        
+                        <div class="form-group">
+                        <label class="col-md-6 col-md-offset-3 control-label"></label>
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}  
+                        <center class="col-md-6 col-md-offset-3"><br>
+                            <button type="submit" class="btn btn-primary btn-block" >{% trans "Sign Up" %}&ensp;<i class="fa fa-sign-in"></i></button>
+                        </center>
+                        </div>
+                        
+                        </fieldset>
+                </form>              
+            </div>  
+          <!-- <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            {{ form|crispy }}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            <button type="submit">{% trans "Sign Up" %} &raquo;</button>
+          </form> -->
+      </div>
+    </div>
+</div>  
+
+
+
+{% endblock content %}

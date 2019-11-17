@@ -1,0 +1,561 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
+{% block content %}
+
+<style>
+ 
+		/* The popup form - hidden by default */
+		.form-popup {
+		  display: none;  
+		  right: 15px;
+		  border: 3px solid #f1f1f1;
+		  z-index: 9;
+		}
+		.form-popup input[type=number]{
+		  width:50%;
+		}
+		</style>
+<section>
+		<div class="container">
+				<div class="row">
+					<center class="form-popup2 col-md-12" id="myForm">
+								<form action="{{ item.get_add_to_cart_url }}" class="form-group">
+									{% csrf_token %} 
+								<div class="h6"> <span class="h3">Order Form</span>
+								<button type="button" class="btn btn-danger btn-xs" onclick="closeForm()"><i class="fa fa-trash"></i>X</button>
+									</div>
+										<div>
+											<!-- <table>{% for forms_type in item.form_type.all  %}	
+											<tr>{% if forms_type.formtype == 'skirt' %}	
+												<span>{{  form.skirt_length|add_class:"form-control"}}</span>
+												{% endif %}
+												{% if forms_type.formtype == 'shirt' %}
+												<span>{{  form.shirt_length|add_class:"form-control"}}</span>{% endif %}
+											</tr>{% endfor %}											
+										</table> -->
+																			
+											{% for forms_type in item.form_type.all  %}	
+											<table>
+												
+
+
+											
+												{% if forms_type.formtype == 'skirt' %}
+												{% if forloop.last == 1 %}
+												<div class="col-md-5 col-md-offset-3">										
+												{% else %}	
+												<div class="col-md-3">					
+												{% endif %}												
+																							
+													<div class="form-group">													
+															<label class="control-label"></label>  
+															<div class="inputGroupContainer">
+															<p><span class="input-group-addon">{{  form.skirt_length.label_tag }}*</span></p>
+															<div class="input-group">
+															<span class="input-group-addon">{{  form.skirt_length.label_tag }}*</span>
+														{{  form.skirt_length|add_class:"form-control"}}
+																</div>
+															{% if  form.skirt_length.help_text %}
+															<small class="form-text text-muted">{{ form.skirt_length.help_text }}</small>
+															{% endif %}
+															</div>
+													</div>
+												</div>					
+												{% endif %}
+											 
+												
+											{% if forms_type.formtype == 'shirt' %}
+											{% if forloop.last == 1 %}
+											<div class="col-md-5 col-md-offset-3">										
+											{% else %}	
+											<div class="col-md-3">					
+											{% endif %}											
+												<div class="form-group">
+														<label class="control-label" for=""></label> 													 
+														<div class="inputGroupContainer">
+															<p><span class="input-group-addon">{{  form.shirt_length.label_tag }}*</span></p>
+															<div class="input-group">
+																<span class="input-group-addon">{{  form.shirt_length.label_tag }}*</span>
+																{{  form.shirt_length|add_class:"form-control"}}
+															</div>
+														{% if  form.shirt_length.help_text %}
+														<small class="form-text text-muted">{{ form.shirt_length.help_text }}</small>
+														{% endif %}
+														</div>
+												</div>											
+											</div>
+											{% endif %}
+										
+											{% if forms_type.formtype == 'gown' %}
+											{% if forloop.last == 1 %}
+											<div class="col-md-5 col-md-offset-3">										
+											{% else %}	
+											<div class="col-md-3">					
+											{% endif %}		
+											
+												<div class="form-group">
+														<label class="control-label" for=""></label>  
+														<div class="inputGroupContainer">
+															<p><span class="input-group-addon">{{  form.gown_length.label_tag }}*</span></p>
+																<div class="input-group">													
+																		<span class="input-group-addon">{{ form.gown_length.label_tag }}*</span>
+																{{ form.gown_length|add_class:"form-control" }}														
+															</div>
+														{% if  form.gown_length.help_text %}
+														<small class="form-text text-muted">{{ form.gown_length.help_text }}</small>
+														{% endif %}
+														</div>
+												</div>						
+											</div>
+											{% endif %}
+										{% if forms_type.formtype == 'trouser' %}
+										{% if forloop.last == 1 %}
+										<div class="col-md-5 col-md-offset-3">										
+										{% else %}	
+										<div class="col-md-3">					
+										{% endif %}						
+											<div class="form-group">
+													<label class="control-label" for=""></label>  
+													<div class="inputGroupContainer">
+															<p><span class="input-group-addon">{{  form.trouser_length.label_tag }}*</span></p>
+														<div class="input-group">
+														<span class="input-group-addon">{{ form.trouser_length.label_tag }}*</span>
+														{{ form.trouser_length|add_class:"form-control" }}													
+														</div>
+													{% if  form.trouser_length.help_text %}
+													<small class="form-text text-muted">{{ form.trouser_length.help_text }}</small>
+													{% endif %}
+													</div>
+											</div>										
+										</div>
+										{% endif %}
+										{% if forms_type.formtype == 'size' %}
+										{% if forloop.last == 1 %}
+										<div class="col-md-5 col-md-offset-3">										
+										{% else %}	
+										<div class="col-md-3">					
+										{% endif %}																		
+											<div class="form-group">
+													<label class="control-label" for="">{{ form.size.label_tag }}</label>  
+													<div class="inputGroupContainer">																		
+														<div class="input-group">														
+														{{ form.size|add_class:"form-control" }}													
+														</div> 
+													{% if  form.size.help_text %}
+													<small class="form-text text-muted">{{ form.size.help_text }}</small>
+													{% endif %}
+													</div>
+											</div>										
+										</div>							
+												
+							
+										{% endif %}
+									
+								</table>
+										{% endfor %}
+											
+								
+								</div>
+								<br />
+								<center class="col-lg-12">
+									<button class="btn-primary btn-lg" type="submit" value="" id="button1">
+										<i class="fa fa-shopping-cart"></i>Add to Cart
+									</button>
+								</center>				
+								<a class="btn-primary btn-lg" href="{{ item.get_add_to_cart_url }}" id="button2"><i class="fa fa-shopping-cart"></i>Add </a>
+								
+								
+								</form>
+	
+						<script>						
+								function openForm() {
+									document.getElementById("myForm").style.display = "block";
+								}
+
+								function closeForm() {
+									document.getElementById("myForm").style.display = "none";
+								}							
+						</script>
+
+					</center> 
+				</div>
+		</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-3">
+				{% include "base/sidebar.html" %}
+			</div>
+			
+			<div class="col-sm-9 padding-right">
+			
+				<div class="product-details"><!--product-details-->
+					<div class="col-sm-5">
+						<div class="view-product">
+							<img src="{{ item.image.url }}" alt="" />
+							<!-- <h3>ZOOM</h3> -->
+						</div>
+						<div id="similar-product" class="carousel slide" data-ride="carousel">
+							
+							  <!-- Wrapper for slides -->
+								<div class="carousel-inner" id="item-active">
+									<div class="item active">
+									  <a href=""><img src="{{ item.image.url }}" alt=""></a>
+									  <a href=""><img src="{{ item.image.url }}" alt=""></a>
+									  <a href=""><img src="{{ item.image.url }}" alt=""></a>
+									</div>
+									<div class="item">
+									  <a href=""><img src="{{ item.image.url }}" alt=""></a>
+									  <a href=""><img src="{{ item.image.url }}" alt=""></a>
+									  <a href=""><img src="{{ item.image.url }}" alt=""></a>
+									</div>									
+								</div>
+
+							  <!-- Controls -->
+							  <a class="left item-control" href="#similar-product" data-slide="prev">
+								<i class="fa fa-angle-left"></i>
+							  </a>
+							  <a class="right item-control" href="#similar-product" data-slide="next">
+								<i class="fa fa-angle-right"></i>
+							  </a>
+						</div>
+
+					</div>
+					<div class="col-sm-7 well">
+						<div class="product-information" style="box-shadow: 3px 3px 3px 3px #e5e5e5;"><!--/product-information-->
+							{% if item.discount_price %}							
+							<p class="h3 label label-info newarrival ext-info" id="discount-label">@ -{{ item.get_discount_percent }}% Discount</p>
+							{% endif %}
+							
+							
+						<table>
+							<tr>
+								<tr>										
+							<h2>{{ item.name|upper }}</h2>
+							<p>ITEM ID: {{ item.get_item_id }}</p>
+							{% if item.label == 'NEW' %}							
+								<img src="{% static 'images/home/new.png' %}" class="new" alt="" />
+								{% elif item.label == 'HOT' %}	
+								<img src="{% static 'images/home/sale.png' %}" class="new" alt="" />
+								{% elif item.label == 'TREND' %}	
+								<img src="{% static 'images/home/sale.png' %}" class="new" alt="" />							  
+								{% else %}	
+								{{ NULL }}
+								{% endif %}				
+
+							<p><b>Availability:</b>	{{ item.availability }}</p>							
+							<p><b>Brand:</b> {{ item.brand }}</p>
+							<p><b>Price:</b> ₦ <b class="h2">					 
+										{% if item.discount_price %}
+										{{ item.discount_price }}
+											{% else %}	
+											{{ item.price }}
+										{% endif %}	
+									</b>
+									
+							</p>  	
+							<button type="button" class="open-button btn btn-success btn-sm" onclick="openForm()">
+								<i class="fa fa-shopping-cart"></i>
+								Make Your Order
+							</button>
+							<a href=""><img src="{% static 'images/product-details/share.png' %}" class="share img-responsive"  alt="" /></a>
+																		
+							</tr>								
+						</tr>
+					</table>
+							</div><!--/product-information-form-popup-->
+							
+						</div>				
+				
+				
+				</div><!--/product-details-->
+			
+				<div class="category-tab shop-details-tab"><!--category-tab-->
+					<div class="col-sm-12">
+						<ul class="nav nav-tabs">
+							<li><a href="#details" data-toggle="tab">Details</a></li>
+							<li><a href="#companyprofile" data-toggle="tab">Company Profile</a></li>
+							<li><a href="#tag" data-toggle="tab">Tag</a></li>
+							<li class="active"><a href="#reviews" data-toggle="tab">Reviews (5)</a></li>
+						</ul>
+					</div>
+					<div class="tab-content">
+						<div class="tab-pane fade" id="details" >
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery1.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery2.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery3.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery4.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="tab-pane fade" id="companyprofile" >
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery1.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery3.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery2.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery4.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="tab-pane fade" id="tag" >
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery1.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery2.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery3.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="product-image-wrapper">
+									<div class="single-products">
+										<div class="productinfo text-center">
+											<img src="{% static 'images/home/gallery4.jpg' %}" alt="" />
+											<h2>$56</h2>
+											<p>Easy Polo Black Edition</p>
+											<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="tab-pane fade active in" id="reviews" >
+							<div class="col-sm-12">
+								<ul>
+									<li><a href=""><i class="fa fa-user"></i>EUGEN</a></li>
+									<li><a href=""><i class="fa fa-clock-o"></i>12:41 PM</a></li>
+									<li><a href=""><i class="fa fa-calendar-o"></i>31 DEC 2014</a></li>
+								</ul>
+								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+								<p><b>Write Your Review</b></p>
+								
+								<form action="#">
+									<span>
+										<input type="text" placeholder="Your Name"/>
+										<input type="email" placeholder="Email Address"/>
+									</span>
+									<textarea name="" ></textarea>
+									<b>Rating: </b> <img src="{% static 'images/product-details/rating.png' %}" alt="" />
+									<button type="button" class="btn btn-default pull-right">
+										Submit
+									</button>
+								</form>
+							</div>
+						</div>
+						
+					</div>
+				</div><!--/category-tab-->
+				
+				<div class="recommended_items"><!--recommended_items-->
+					<h2 class="title text-center">recommended items</h2>
+					
+					<div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
+						<div class="carousel-inner">
+							<div class="item active">	
+								<div class="col-sm-4">
+									<div class="product-image-wrapper">
+										<div class="single-products">
+											<div class="productinfo text-center">
+												<img src="{% static 'images/home/recommend1.jpg' %}" alt="" />
+												<h2>$56</h2>
+												<p>Easy Polo Black Edition</p>
+												<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-4">
+									<div class="product-image-wrapper">
+										<div class="single-products">
+											<div class="productinfo text-center">
+												<img src="{% static 'images/home/recommend2.jpg' %}" alt="" />
+												<h2>$56</h2>
+												<p>Easy Polo Black Edition</p>
+												<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-4">
+									<div class="product-image-wrapper">
+										<div class="single-products">
+											<div class="productinfo text-center">
+												<img src="{% static 'images/home/recommend3.jpg' %}" alt="" />
+												<h2>$56</h2>
+												<p>Easy Polo Black Edition</p>
+												<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="item">	
+								<div class="col-sm-4">
+									<div class="product-image-wrapper">
+										<div class="single-products">
+											<div class="productinfo text-center">
+												<img src="{% static 'images/home/recommend1.jpg' %}" alt="" />
+												<h2>$56</h2>
+												<p>Easy Polo Black Edition</p>
+												<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-4">
+									<div class="product-image-wrapper">
+										<div class="single-products">
+											<div class="productinfo text-center">
+												<img src="{% static 'images/home/recommend2.jpg' %}" alt="" />
+												<h2>$56</h2>
+												<p>Easy Polo Black Edition</p>
+												<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-4">
+									<div class="product-image-wrapper">
+										<div class="single-products">
+											<div class="productinfo text-center">
+												<img src="{% static 'images/home/recommend3.jpg' %}" alt="" />
+												<h2>$56</h2>
+												<p>Easy Polo Black Edition</p>
+												<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						 <a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
+							<i class="fa fa-angle-left"></i>
+						  </a>
+						  <a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
+							<i class="fa fa-angle-right"></i>
+						  </a>			
+					</div>
+				</div><!--/recommended_items-->
+				
+			</div>
+		</div>
+	</div>
+</section>
+
+
+{% endblock content %}

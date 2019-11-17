@@ -1,0 +1,13 @@
+def namestr(**kwargs):
+        bowl = []
+        for k,v in kwargs.items():
+            if v != None:
+                bowl.append("%s = %s" % (k, v))
+                return bowl 
+    get_p_list = namestr(
+        size =  request.session.get('size'),
+        skirt_length =  request.session.get('skirt_length'),
+        shirt_length =  request.session.get('shirt_length'),
+        gown_length =  request.session.get('gown_length'),
+        trouser_length =  request.session.get('trouser_length')
+    )        

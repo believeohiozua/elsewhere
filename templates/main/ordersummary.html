@@ -1,0 +1,114 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+{% load cart_template_tags %} 
+{% block content %}
+<section id="cart_items">
+		<div class="container">
+			<div class="breadcrumbs">
+				<ol class="breadcrumb">
+				  <li><a href="/">Home</a></li>
+				  <li class="active">Shopping Cart</li>
+				</ol>
+			</div>
+			<div class="table-responsive cart_info text-nowrap">
+				<table class="table table-condensed">
+					<thead>
+						<tr class="cart_menu">			<h1>{{shirt_length}}</h1>
+							<td class="image">Item</td>
+							<td class="description"></td>
+							<td class="price">Price</td>
+							<td class="quantity">Quantity</td>
+							<td class="total">Total</td>
+							<td></td>
+						</tr>
+					</thead>
+					<tbody>
+                            {% for order_item in object.items.all %}						
+						<tr>
+							<td class="">
+								<a href=""><img src="{{order_item.item.image.url}}" alt="" height="120" width="120"></a>
+							</td>
+							<!-- -----{{order_item.pk}}------{{order_item.item.id}} -->
+							<td class="cart_description">
+								<h4><a href="">{{order_item.item.name}}</a></h4>
+                                <p>Item ID: {{order_item.item.get_item_id}}</p>                             
+                                <p><details style="position:absolute; z-index: 10;">
+                                        <summary>
+                                            order 
+                                        </summary>
+                                       <small><p> {{order_item.orderPref}}</p></small>
+                                    </details></p>
+							</td>
+							<td class="cart_price">
+                            {% if order_item.item.discount_price %}                           
+                                <p>₦{{order_item.item.discount_price}}</p>
+                                {% else %}                              
+                                <p>₦{{order_item.item.price}}</p>
+                                {% endif %} 
+							</td>
+							<td class="">
+								<div class="cart_quantity_button">
+									<a class="cart_quantity_up" href="{% url 'src:increase-quantity' order_item.pk %}"> + </a>
+									<!-- <input class="cart_quantity_input" type="text" name="quantity" value="1" autocomplete="off" size="2"> -->
+									<span class="cart_quantity_input">{{order_item.quantity}}</span>
+									<a class="cart_quantity_down" href="{% url 'src:remove-single-item-from-cart' order_item.pk %}"> - </a>
+								</div>
+							</td>
+							<td class="cart_total">
+                                    {% if order_item.item.discount_price %}
+                                    <p class="cart_total_price">₦{{order_item.get_total_discount_item_price}}</p>
+                                    <span class="badge badge-primary">
+                                        Saving ${{order_item.get_amount_saved}}
+                                    </span>
+                                    {% else %}
+                                <p class="cart_total_price">₦{{order_item.get_total_item_price}}</p>
+                                {% endif %}
+							</td>
+							<td class="cart_delete">
+								<a class="cart_quantity_delete" href="{% url 'src:remove-from-cart' order_item.pk %}"><i class="fa fa-times"></i></a>
+							</td>
+						</tr>
+						{% empty %}
+                    <tr>
+                        <td colspan="5">Your Cart is Empty</td>
+                    </tr>
+                    <td colspan="5">
+                        <a class="btn btn-primary float-right" href="/">Continue Shopping</a>
+                    </td>
+                    <tr>
+
+                    </tr>
+                    {% endfor %}
+                     
+					</tbody>
+				</table> 
+			</div>
+		</div>
+	</section> <!--/#cart_items-->
+
+	<section id="do_action">
+		<div class="container">
+			<div class="heading">
+				<h3>Cost Summary</h3>
+				<p>Shipping fees not included yetCustoms Fee not included yet</p>
+			</div>
+			<div class="row">				
+				<div class="col-sm-12">
+					<div class="total_area">
+						<ul>
+							<li class="h3">Cart Sub Total <span>₦{{object.get_total}}</span></li>
+							<small class=" text-danger">Shipping fees and Customs Fee not included yet</small>
+							<!-- <li>Eco Tax <span>$2</span></li>
+							<li>Shipping Cost <span>Free</span></li>
+							<li>Total <span>$61</span></li> -->
+                        </ul>
+                        <div class="pull-right">
+							<a class="btn btn-primary btn-lg update" href="/">Continue Shopping     </a>
+                            <a class="btn btn-info btn-lg check_out" href="/checkout/">Check Out</a>
+                    </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section><!--/#do_action-->
+{% endblock content %}

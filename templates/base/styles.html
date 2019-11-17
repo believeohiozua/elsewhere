@@ -1,0 +1,66 @@
+{% load staticfiles %}
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>{% block head_title %}{% endblock %}</title>
+        {% block extra_head %}
+        {% endblock %}        
+        <link href="{% static 'css/boot.css' %}" rel="stylesheet">
+        <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/prettyPhoto.css' %}" rel="stylesheet">
+        <link href="{% static 'css/price-range.css' %}" rel="stylesheet">
+        <link href="{% static 'css/animate.css' %}" rel="stylesheet">
+        <link href="{% static 'css/main.css' %}" rel="stylesheet">
+        <link href="{% static 'css/responsive.css' %}" rel="stylesheet">
+        <!--[if lt IE 9]>
+        <script src="js/html5shiv.js"></script>
+        <script src="js/respond.min.js"></script>
+        <![endif]-->       
+        <link rel="shortcut icon" href="{% static 'images/ico/favicon.ico' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{% static 'images/ico/apple-touch-icon-144-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{% static 'images/ico/apple-touch-icon-114-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{% static 'images/ico/apple-touch-icon-72-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" href="{% static 'images/ico/apple-touch-icon-57-precomposed.png' %}">
+    </head><!--/head-->
+
+    <style>
+.header_top {
+    display: block;
+    box-shadow: 5px 3px #e5e5e5;
+}
+.product-image-wrapper{
+    box-shadow: 3px 3px 3px #e5e5e5;
+}
+#item-active img{
+ width: 90px;
+ height: 90px;
+}
+
+.newarrival{
+    position: absolute;
+    top: 0;
+    left: 0;
+   
+  
+}
+#discount-label{
+    color: white;
+}
+#myForm{
+    position: absolute; 
+    z-index: 1000; 
+    padding: 10%;
+    background-color:#bd8cbd8c;
+}
+@media screen and (max-width:700px){
+    #myForm{
+    position: absolute; 
+    z-index: 1000; 
+    padding: 10%;
+    top: 30%;
+    background-color:#bd8cbd8c;
+}
+}
+</style>

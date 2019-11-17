@@ -1,0 +1,168 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
+{% block content %}
+
+	<section id="cart_items">
+		<div class="container">
+			<div class="breadcrumbs">
+				<ol class="breadcrumb">
+				  <li><a href="/">Home</a></li>
+				  <li class="active">Check out</li>
+				</ol>
+			</div><!--/breadcrums--> 
+
+			<div class="register-req">
+				<p>Please use Register And Checkout to easily get access to your order history, or use Checkout as Guest</p>
+			</div><!--/register-req-->
+			<div class="shopper-informations">
+				<div class="row">					
+					<div class="col-sm-8 clearfix">
+						<div class="bill-to">
+							<p>Bill To &ensp;<label for="">{{request.user.username}}</label>&ensp;@</p>
+							<div class="card-body">
+									
+							<p class="text-center">	
+								<label for="">{{request.user.first_name|upper}}</label>&ensp;
+								<label for="">{{request.user.last_name|upper}}</label><br />
+								
+							
+
+							{% if default_shipping_street %}
+							<span class="h4">{{ default_shipping_street.shipping_street }},
+								 {{ default_shipping_street.shipping_state}},
+								  {{ default_shipping_street.shipping_lga}}<br>
+								<small for="">{{request.user.email}},</small>
+								<small for="">{{default_shipping_street.phone_number}}</small><br>
+							</span>
+							<div class="custom-control custom-checkbox">
+								{{form.use_default_shipping}}								
+								<label class="custom-control-label" for="use_default_shipping">Use the address above</label>								
+							</div>
+							{% endif %}	
+							</p>
+							<hr>						
+					  <!--address-->
+					  <form method="POST" class="card-body">
+							{% csrf_token %}
+					  <div class="hideable_shipping_form">
+									<div class="md-form mb-5">
+											{% if form.shipping_street.errors %}<div class="alert alert-danger" role="alert">{{ form.shipping_street.errors }}</div> {%endif%}
+										<label for="shipping_street" class="">Address</label>
+												 {{form.shipping_street|add_class:"form-control"}}
+										<div class="invalid-feedback">
+											<small> shipping Address.</small>
+											</div>										  
+									</div>
+								
+									<div class="row">					  
+									  <!--shipping state-->
+									  <div class="col-lg-4 col-md-12 mb-4">	
+										{% if form.shipping_state.errors %}<div class="alert alert-danger" role="alert">{{ form.shipping_state.errors }}</div> {%endif%}				  
+										<label for="country">State</label>
+										{{form.shipping_state|add_class:"form-control"}}	
+										<div class="invalid-feedback">
+										 <small> shipping state.</small>
+										</div>					  
+									  </div>	
+									  	<!--shipping Local govt. Area-->								 
+									  <div class="col-lg-4 col-md-6 mb-4">
+											{% if form.shipping_lga.errors %}<div class="alert alert-danger" role="alert">{{ form.shipping_lga.errors }}</div> {%endif%}				  					  
+										<label for="state">LGA</label>
+										{{form.shipping_lga|add_class:"form-control"}}
+										<div class="invalid-feedback">
+												<small>shipping Local govt. Area.</small>
+										</div>					  
+									  </div>
+									  <div class="col-lg-4 col-md-6 mb-4">
+										{% if form.phone_number.errors %}<div class="alert alert-danger" role="alert">{{ form.phone_number.errors }}</div> {%endif%}
+											<label for="zip">Phone Number</label>
+											{{form.phone_number|add_class:"form-control"}}
+											<div class="invalid-feedback">
+												<small>shipping Phone Number.</small>
+											</div>
+						  
+										  </div>									 
+									</div>
+									<!--Grid row-->
+					  
+									<hr>							
+									<div class="custom-control custom-checkbox">
+										{% if form.default.errors %}<div class="alert alert-danger" role="alert">{{ form.default.errors }}</div> {%endif%}
+										<input type="checkbox" class="custom-control-input" name="default" id="default">										
+									<label class="custom-control-label" for="default">Save as default shipping address</label>
+									</div>						
+							</div>
+							<div class="order-message">			
+									{% if form.message.errors %}<div class="alert alert-danger" role="alert">{{ form.message.errors }}</div> {%endif%}						
+									<label for="country">Shipping Order Info</label>									
+									{{form.message|add_class:"form-control"}}								
+								</div>
+							<hr>
+									<h3 class="text-center">Payment</h3>
+									<div class="d-block my-3">																	
+										<small class="total_area col-md-12">
+												<ul>
+													<li>Cart Sub Total <span>₦{{ order.get_total }}</span></li>									
+													<li>Shipping Cost <span id="fee"></span></li>
+													<li>Total <span id="grandtotal"></span></li>
+												</ul>									
+										</small>							
+												<br>
+										<center>
+										{% for value, name in form.fields.payment_option.choices %}
+											<span class="custom-control custom-radio">
+												<input id="{{ name }}" name="payment_option" value="{{ value }}" type="radio" class="custom-control-input" required>
+												<label class="custom-control-label" for="{{ name }}">{{ name }}</label>
+											</span>																	
+											{% endfor %}
+										</center>
+									</div>									  
+								  </div>
+													
+							
+						</div>
+						<center class="col-sm-12">						
+							<button class="btn btn-primary btn-lg btn-block" type="submit"> proceed to payment</button>
+						</center>
+					</form>
+					</div>
+					<div class="col-sm-4">					
+					{% include 'main/order_section.html' %}	
+					</div>		
+				</div>
+			</div>
+		
+				<hr>
+	</div>
+	
+	</section> <!--/#cart_items-->
+
+{% endblock content %}
+
+{% block extra_script %}
+<script>
+var hideable_shipping_form = $('.hideable_shipping_form');
+var use_default_shipping = document.querySelector("input[name=use_default_shipping]");
+use_default_shipping.addEventListener('change', function() {
+  if (this.checked) {
+    hideable_shipping_form.hide();
+  } else {
+    hideable_shipping_form.show();
+  }
+})
+
+$( "#id_shipping_state" ).mouseout(function() {
+	if ($('#id_shipping_state').val() === "Edo") {
+		// alert('500');
+		document.getElementById("fee").innerHTML ='₦'+500;
+		document.getElementById("grandtotal").innerHTML ='₦'+(500+{{ order.get_total }});
+	}else {
+		document.getElementById("fee").innerHTML ='₦'+(1500);		
+		document.getElementById("grandtotal").innerHTML ='₦'+(1500+{{ order.get_total }});
+	}
+})
+
+</script>
+{% endblock extra_script %}
