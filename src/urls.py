@@ -13,7 +13,9 @@ from .views import (
     AddCouponView,
     OnlinePaymentView,
     BankpPaymentView,
-    Profile,
+    ProfileDetailView,
+    ProfileCreateView,
+    ProfileUpdate,
 
 
     add_to_cart2
@@ -35,7 +37,14 @@ urlpatterns = [
     path('add-coupon/', AddCouponView.as_view(), name='add-coupon'),
     path('online/<payment_option>/', OnlinePaymentView.as_view(), name='online'),
     path('bank/<payment_option>/', BankpPaymentView.as_view(), name='bank'),
-    path('profile/<slug>/', Profile.as_view(), name='profile'),
+
+    #profile
+    path('createprofile/', ProfileCreateView.as_view(), name='createprofile'),
+    path('profile/<pk>/', ProfileDetailView.as_view(), name='profile'),
+    # path('updateprofile/<pk>/', ProfileUpdateView.as_view(), name='updateprofile'),
+    path('updateprofile/<pk>/', ProfileUpdate, name='updateprofile'),
+   
+    
 
 
 

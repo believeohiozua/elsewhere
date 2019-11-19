@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from allauth.account.signals import user_signed_up
 from django.conf import settings
 from django.db import models
@@ -22,53 +22,45 @@ AVALABILITY_CHOICES = (
     ('Out of Stock', 'out_of_stock'),     
 )
 
-
+ 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE) 
-    # user = models.OneToOneField(
-    #     settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100, blank=True, null=True) 
-    last_name = models.CharField(max_length=100, blank=True, null=True)
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)  
     phone_number= models.CharField(max_length=100, blank=True, null=True)
     gender=models.CharField(max_length=100, blank=True, null=True)
+    birthday = models.DateField(blank=True, null=True)
     stripe_customer_id = models.CharField(max_length=50, blank=True, null=True)
     one_click_purchasing = models.BooleanField(default=False)
-    slug = models.SlugField(blank=True, null=True, default="")
+    profile_photo = ResizedImageField(size=[80, 80], upload_to='profile', blank=True, null=True, force_format='PNG') 
 
-    def save(self, *args, **kwargs):
-        value = self.user
-        self.slug = slugify(value, allow_unicode=True)
-        super().save(*args, **kwargs)
+   
 
     def __str__(self):
-        return str(self.slug)
+        return self.pk
     
     def get_absolute_url(self):
         return reverse('src:profile', kwargs={
-             'slug': self.slug
+             'pk': self.pk
         })
 #******************
 def ProfileCallback(sender, request, user, **kwargs):
     userProfile, is_created = Profile.objects.get_or_create(user=user)
     if is_created:          
-        userProfile.first_name=user.first_name
-        userProfile.last_name=user.last_name      
-        # userProfile.phone_number=user.phone_number 
-        # userProfile.gender=user.gender 
+        userProfile.phone_number=user.phone_number 
+        userProfile.gender=user.gender 
         userProfile.save()
 user_signed_up.connect(ProfileCallback)
+# pre_save.connect(ProfileCallback, sender=settings.AUTH_USER_MODEL)
 
-# def profile_receiver(sender, instance, created, *args, **kwargs):
-#     if created:
-#         userProfile,is_created = Profile.objects.create(user=instance)
-#         if is_created:        
-#             userProfile.first_name = user.first_name
-#             userProfile.last_name = user.last_name      
-#             userProfile.phone_number = user.phone_number 
-#             userProfile.gender = user.gender 
-#             userProfile.save()
-# post_save.connect(profile_receiver, sender=settings.AUTH_USER_MODEL)
+# def profile_receiver(sender, **kwargs):   
+#     userProfile, created = Profile.objects.create(user=settings.AUTH_USER_MODEL)
+#     if created:        
+#         userProfile.first_name = user.first_name
+#         userProfile.last_name = user.last_name      
+#         # userProfile.phone_number = user.phone_number 
+#         # userProfile.gender = user.gender 
+#         userProfile.save()
+# pre_save.connect(profile_receiver, sender=settings.AUTH_USER_MODEL)
 
 class Category(models.Model):
     category = models.CharField(max_length=20)   
@@ -92,7 +84,7 @@ class Item(models.Model):
     brand =  models.CharField(max_length=100)
     quantity = models.IntegerField() 
     description = models.TextField()    
-    image = ResizedImageField(size=[215, 215], upload_to='items')    
+    image = ResizedImageField(size=[215, 215], upload_to='items', force_format='PNG')    
     slug = models.SlugField(blank=True, null=True, default="Please-Leave-Blank")
 
     def __str__(self):
@@ -177,6 +169,7 @@ class Order(models.Model):
     received = models.BooleanField(default=False)
     refund_requested = models.BooleanField(default=False)
     refund_granted = models.BooleanField(default=False)
+    status=models.CharField(max_length=100, blank=True, null=True) 
 
 
     def __str__(self):
@@ -198,6 +191,31 @@ class Order(models.Model):
             quantity += order_item.get_quantity()    
         return quantity
 
+    def save(self, *args, **kwargs):
+        if not self.ordered:
+            value = 'Not Ordered'
+            self.status = value
+            super().save(*args, **kwargs)
+        else: 
+            value = 'Ordered'
+            self.status = value
+            super().save(*args, **kwargs)
+        if self.being_delivered:
+            value = 'Being Deliverd'
+            self.status = value
+            super().save(*args, **kwargs)
+        elif self.received:
+            value = 'Received'
+            self.status = value
+            super().save(*args, **kwargs)
+        elif self.refund_requested:
+            value = 'Refund Requested'
+            self.status = value
+            super().save(*args, **kwargs)
+        elif self.refund_granted:
+            value = 'Refund Granted'
+            self.status = value
+            super().save(*args, **kwargs)
 
 ADDRESS_CHOICES = (
     ('B', 'Billing'),

@@ -3,7 +3,7 @@ from .models import Item, Category,FormType,OrderItem, Order, Address, Payment, 
 
 
 def make_refund_accepted(modeladmin, request, queryset):
-    queryset.update(refund_requested=False, refund_granted=True)
+    queryset.update(refund_requested=False, refund_granted=True, status='Refund Granted')
 
 
 make_refund_accepted.short_description = 'Update orders to refund granted'
@@ -11,12 +11,13 @@ make_refund_accepted.short_description = 'Update orders to refund granted'
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['user',
-                    'ordered',
-                    'being_delivered',
-                    'received',
-                    'refund_requested',
-                    'refund_granted',
-                    'shipping_address',                    
+                    # 'ordered',
+                    # 'being_delivered',
+                    # 'received',
+                    # 'refund_requested',
+                    # 'refund_granted',
+                    'shipping_address',    
+                    'status',              
                     'payment',
                     'coupon',
                     'shipping_fee',
@@ -53,10 +54,9 @@ class AddressAdmin(admin.ModelAdmin):
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = [
-            'user',
-            'first_name',
-            'last_name',
+            'user',            
             'phone_number',
+            'gender',
             'gender',
             
     ]

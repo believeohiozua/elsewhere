@@ -13,6 +13,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('account/', include('allauth.urls')),
     url(r'^oauth/', include('social_django.urls', namespace="social")),
+    path("djangorave/", include("djangorave.urls", namespace="djangorave"))
     
 ]
 

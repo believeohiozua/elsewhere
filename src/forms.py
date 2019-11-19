@@ -14,7 +14,8 @@ Gender_CHOICE = [
 class MyCustomSignupForm(SignupForm):
     first_name = forms.CharField(max_length=30, label='First Name', widget=forms.TextInput({'placeholder':'First Name','class':'form-class'}))    
     last_name = forms.CharField(max_length=30, label='Last Name', widget=forms.TextInput({'placeholder':'Last Name','class':'form-class'}))    
-    gender = forms.CharField(required = True, label='Gender', widget=forms.Select(choices=Gender_CHOICE))   
+    gender = forms.CharField(required = True, label='Gender', widget=forms.Select(choices=Gender_CHOICE))
+    birthday = forms.DateField(widget=forms.SelectDateWidget)   
     phone_number = forms.IntegerField(required = True, help_text = '',  label='Phone') 
     class Meta:
         model = User 
@@ -24,19 +25,43 @@ class MyCustomSignupForm(SignupForm):
         request.user.first_name = self.cleaned_data['first_name']      
         request.user.last_name = self.cleaned_data['last_name']
         request.user.gender = self.cleaned_data['gender']       
-        request.user.phone_number = self.cleaned_data['phone_number']       
+        request.user.phone_number = self.cleaned_data['phone_number'] 
+        request.user.birthday = self.cleaned_data['birthday']       
         request.user = super(MyCustomSignupForm, self).save(request)
         request.user.save()
         
         profile, created=Profile.objects.get_or_create(     
-        user=request.user,
-        first_name=self.cleaned_data['first_name'],
-        last_name=self.cleaned_data['last_name'],
+        user=request.user,       
         gender=self.cleaned_data['gender'],
-        phone_number=self.cleaned_data['phone_number']       
+        phone_number=self.cleaned_data['phone_number'],  
+        birthday=self.cleaned_data['birthday']     
         )       
         profile.save()
         return request.user
+
+
+class UserUpdateForm(forms.ModelForm):
+    username = forms.CharField(max_length=30, label='Username', widget=forms.TextInput({'placeholder':'UserName','class': 'form-control'})) 
+    first_name = forms.CharField(max_length=30, label='First name', widget=forms.TextInput({'placeholder':'first name','class': 'form-control'}))
+    last_name = forms.CharField(max_length=30, label='Last name', widget=forms.TextInput({'placeholder':'last name','class': 'form-control'}))
+    email = forms.EmailField( widget=forms.EmailInput({'placeholder':'E-Mail','class': 'form-control'}))
+    
+    class Meta:
+        model = User
+        fields = ['username', 'email','first_name','last_name']
+
+class ProfileForm(forms.ModelForm):
+    phone_number = forms.IntegerField(required =True,  help_text = "Whatsapp",  widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    gender = forms.CharField(label='Gender', widget=forms.Select(choices=Gender_CHOICE))
+    birthday =  forms.DateField(required = False, label='Birthday',
+        widget=forms.DateInput( format='%Y-%m-%d', attrs={'class': 'form-control vDateField', 'type':'Date'}),
+        input_formats=['%Y-%m-%d',]
+        ) 
+
+    class Meta:
+        model = Profile
+        fields = ['gender', 'birthday','profile_photo',  'phone_number',
+                    ]
 
 PAYMENT_CHOICES = (
     ('O', 'Online Payment'),
@@ -66,7 +91,7 @@ LGA_CHOICE = (
 class CheckoutForm(forms.Form):    
     shipping_street=forms.CharField(required=False, max_length=1000)#, label="Other categories", widget=forms.TextInput({'placeholder':'If Category is not listed'}))
     shipping_state=forms.CharField(required=False, widget=forms.Select(choices=STATE_CHOICE,attrs={
-                                                            'onclick':"checkNullSearch(this)"
+                                                        
                                                                 }))
     shipping_lga=forms.CharField(required=False, max_length=100)
     phone_number=forms.IntegerField(required=False)

@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
+{% load cart_template_tags %} 
+{% block content %}
+
+<hr >
+
+<div class="container">
+        <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                <form method="POST" action="." enctype="multipart/form-data" class="well form-horizontal">
+                        {% csrf_token %}
+                        <fieldset>                
+                                {{ userForm|crispy}} 
+                                {{ profileForm|crispy}} 
+                                <button type="submit" class="btn btn-primary btn-block">create</button><hr >
+                        </fieldset>
+                </form>
+       
+         </div>
+    </div>
+</div>
+
+<hr >
+{% endblock content %}

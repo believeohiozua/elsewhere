@@ -6,10 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import FormTypeForm, CheckoutForm, CouponForm, RefundForm, PaymentForm, MyCustomSignupForm
+from .forms import FormTypeForm, CheckoutForm, CouponForm, RefundForm, PaymentForm, MyCustomSignupForm, UserUpdateForm, ProfileForm
+from djangorave.models import PaymentTypeModel
 #my Views
 from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, Profile
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 def is_valid_form(values): 
     valid = True
@@ -19,18 +21,103 @@ def is_valid_form(values):
     return valid
 
 
-class Profile(DetailView):
-    model = Profile   
-    template_name = "main/userprofile.html"
-
+############################################################################################
 
 class IndexView(ListView):
     model = Item
-    paginate_by = 10
+    # paginate_by = 10
     template_name = "main/index.html"
+
+class ProfileCreateView(CreateView):
+    def get(self, *args, **kwargs):
+        profileForm=ProfileForm()
+        userForm=UserUpdateForm()
+        context={
+            'profileForm':profileForm,
+            'userForm':userForm
+                }
+        template = "main/profileform.html"
+        return render(self.request, template , context)
+    def post(self, *args, **kwargs):
+        profileForm=ProfileForm(self.request.POST or None, self.request.FILES or None)
+        userForm=UserUpdateForm(self.request.POST or None)
+        if profileForm.is_valid() and userForm.is_valid():
+            profileForm.instance.user = self.request.user
+            userForm.save()
+            profileForm.save()                       
+            return redirect(reverse("src:profile", kwargs={
+            'pk': profileForm.instance.pk
+            })) 
+           
+
+
+class ProfileDetailView(DetailView):
+     def get(self, *args, **kwargs):
+        profile = Profile.objects.get(user=self.request.user)
+        order = Order.objects.filter(user=self.request.user)
+        myorderitem = OrderItem.objects.filter(user=self.request.user)
+        if order.exists:
+            try:
+                orders=order[0]
+            except:
+                orders=None
+        context={
+            'profile': profile,
+            'orders':orders,
+            'myorderitem':myorderitem
+                }
+        template = "main/userprofile.html"
+        return render(self.request, template , context)
+
+    # model = Profile     
+    # template_name = "main/userprofile.html"
+
+
+def ProfileUpdate(request, pk):
+    profileForm=ProfileForm()
+    userForm=UserUpdateForm()
+    profile=get_object_or_404(Profile, pk=pk)        
+    profileForm=ProfileForm(request.POST or None, request.FILES or None, instance=profile)
+    userForm=UserUpdateForm(request.POST or None, instance=request.user)
+    if request.method == "POST":
+        if profileForm.is_valid() and userForm.is_valid():
+            profileForm.instance.user = request.user
+            userForm.save()
+            profileForm.save() 
+            profile.save()                      
+            return redirect(reverse("src:profile", kwargs={
+            'pk': profileForm.instance.pk
+            }))
+
+    context={
+        'title':'Update Your Profile',
+        'profileForm':profileForm,
+        'userForm':userForm
+    }
+    template = "main/profileform.html"
+    return render(request, template , context)
 ############################################################################################
-class CheckoutView(View):
-    
+class ItemCreateView(CreateView):
+    model = Item  
+    fields = '__all__'   
+    template_name = "main/itemform.html"
+
+class ItemDetailView(DetailView):
+    model = Item    
+    template_name = "main/item.html"
+    form = FormTypeForm() 
+    context_object_name = 'item'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)         
+        context['form'] = self.form      
+        return context 
+
+class ItemUpdateView(UpdateView):
+    model = Item  
+    fields = '__all__'   
+    template_name = "main/itemform.html"
+############################################################################################
+class CheckoutView(View):    
     def get(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
         form = CheckoutForm()
@@ -150,8 +237,20 @@ class CheckoutView(View):
 
 
 class OnlinePaymentView(View):
+    # model=PaymentTypeModel
+    # template_name = "main/onlinepayment.html"
+    # def get_context_data(self, **kwargs):
+    #     """Add payment type to context data"""
+    #     kwargs = super().get_context_data(**kwargs)
+    #     kwargs["pro_plan"] = PaymentTypeModel.objects.filter(
+    #         description="Pro Plan"
+    #     ).first()
+
+    #     return kwargs
+
     def get(self, *args, **kwargs):
-        context = {}
+        p = PaymentTypeModel.objects.filter(description="Pro Plan").first()
+        context = { 'pro_plan':p    }
         return render(self.request, "main/onlinepayment.html", context)
 
 class BankpPaymentView(View):
@@ -183,15 +282,7 @@ class AddCouponView(View):
                 messages.info(self.request, "You do not have an active order")
                 return redirect("src:checkout")
 ############################################################################################
-class ItemDetailView(DetailView):
-    model = Item    
-    template_name = "main/item.html"
-    form = FormTypeForm() 
-    context_object_name = 'item'
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)         
-        context['form'] = self.form      
-        return context    
+   
 
 @login_required
 def add_to_cart(request, slug):
@@ -228,7 +319,14 @@ def add_to_cart(request, slug):
                 return redirect("src:order-summary")    
         order.items.add(order_item)
         messages.info(request, "This item was added to your cart.")
-        return redirect("src:order-summary") 
+        return redirect("src:order-summary")
+    else:
+        ordered_date = timezone.now()
+        order = Order.objects.create(
+            user=request.user, ordered_date=ordered_date)
+        order.items.add(order_item)
+        messages.info(request, "This item was added to your cart.")
+        return redirect("src:order-summary")
     return redirect("src:order-summary") 
 
 
@@ -284,20 +382,23 @@ def increase_quantity(request, pk):
     orderPref =  OrderItem.objects.get(pk=pk)
     param = str(orderPref).strip( ' ' ).split(']')[0]+']'    
     o = OrderItem.objects.all()          
-    q = OrderItem.objects.get(orderPref=param)            
+    q = OrderItem.objects.get(user=request.user, orderPref=param)
+    print('\n =====this is q',  q, '\n =====this is param', param)           
     for p in o:
-        if p == q:           
+        if p ==  q: 
+            print('\n THIS IS PP===', p,   q.quantity)          
             q.quantity += 1
             q.save()
             messages.info(request, "This item quantity was updated.")
             return redirect("src:order-summary")
+    return redirect("src:order-summary")
 
 @login_required
 def remove_single_item_from_cart(request, pk):
     orderPref =  OrderItem.objects.get(pk=pk)
     param = str(orderPref).strip( ' ' ).split(']')[0]+']'    
     o = OrderItem.objects.all()          
-    q = OrderItem.objects.get(orderPref=param)            
+    q = OrderItem.objects.get(user=request.user, orderPref=param)            
     for p in o:
         if p == q and  q.quantity > 1:       
             q.quantity -= 1
@@ -315,7 +416,7 @@ def remove_from_cart(request, pk):
     orderPref =  OrderItem.objects.get(pk=pk)
     param = str(orderPref).strip( ' ' ).split(']')[0]+']'    
     o = OrderItem.objects.all()          
-    q = OrderItem.objects.get(orderPref=param)            
+    q = OrderItem.objects.get(user=request.user, orderPref=param)            
     for p in o:
         if p == q:       
             q.delete()          
@@ -326,18 +427,27 @@ def remove_from_cart(request, pk):
 
 
 class OrderSummaryView(LoginRequiredMixin, View):   
-    def get(self, slug, *args, **kwargs):
-        try:
-            order = Order.objects.get(user=self.request.user, ordered=False)
-            print('======', order)
-            order2 = Item.objects.all()
-            context = {
-                'object': order,              
-                }
-            return render(self.request, 'main/ordersummary.html', context)
-        except ObjectDoesNotExist:
-            messages.info(self.request, "You do not have an active order")
-            return redirect("/")
+    # def get(self, slug, *args, **kwargs):
+    #     try:
+    #         order = Order.objects.get(user=self.request.user, ordered=False)
+    #         print('======', order)            
+    #         context = {
+    #             'object': order[0],              
+    #             }
+    #         return render(self.request, 'main/ordersummary.html', context)
+    #     except ObjectDoesNotExist:
+    #         messages.info(self.request, "You do not have an active order")
+    #         return redirect("/")
 
+    def get(self, slug, *args, **kwargs):
+        order = Order.objects.get(user=self.request.user, ordered=False)
+        # if order.exists:
+        #     order=order[0]
+        print('======', order, self.request.user)            
+        context = {
+            'object': order,              
+            }
+        return render(self.request, 'main/ordersummary.html', context)
+        
 
 

@@ -11,7 +11,7 @@
 				  <li><a href="/">Home</a></li>
 				  <li class="active">Check out</li>
 				</ol>
-			</div><!--/breadcrums--> 
+			</div><!--/breadcrums-->  
 
 			<div class="register-req">
 				<p>Please use Register And Checkout to easily get access to your order history, or use Checkout as Guest</p>
@@ -143,6 +143,20 @@
 
 {% block extra_script %}
 <script>
+
+
+$( "#id_shipping_state" ).mouseout(function() {
+	if ($('#id_shipping_state').val() === "Edo") {
+		// alert('500');
+		document.getElementById("fee").innerHTML ='₦'+500;
+		document.getElementById("grandtotal").innerHTML ='₦'+(500+ {{ order.get_total }} );
+	} else {
+		document.getElementById("fee").innerHTML ='₦'+(1500);		
+		document.getElementById("grandtotal").innerHTML ='₦'+(1500+{{ order.get_total }});
+	}
+})
+
+
 var hideable_shipping_form = $('.hideable_shipping_form');
 var use_default_shipping = document.querySelector("input[name=use_default_shipping]");
 use_default_shipping.addEventListener('change', function() {
@@ -151,18 +165,6 @@ use_default_shipping.addEventListener('change', function() {
   } else {
     hideable_shipping_form.show();
   }
-})
-
-$( "#id_shipping_state" ).mouseout(function() {
-	if ($('#id_shipping_state').val() === "Edo") {
-		// alert('500');
-		document.getElementById("fee").innerHTML ='₦'+500;
-		document.getElementById("grandtotal").innerHTML ='₦'+(500+{{ order.get_total }});
-	}else {
-		document.getElementById("fee").innerHTML ='₦'+(1500);		
-		document.getElementById("grandtotal").innerHTML ='₦'+(1500+{{ order.get_total }});
-	}
-})
-
+});
 </script>
 {% endblock extra_script %}

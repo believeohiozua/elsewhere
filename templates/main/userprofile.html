@@ -1,6 +1,74 @@
 {% extends 'base/base.html' %}
-{% load staticfiles %}
+{% load staticfiles %} 
 {% load cart_template_tags %} 
 {% block content %}
+
+
+{% if profile.user == request.user %} 
+
+<main>
+    <div class="container well">
+    <div class="table-responsive text-nowrap">
+            <table class="table">
+                <tr>
+                    <td colsmall="1">
+                        {% if profile.profile_photo %}
+                        <img src="{{ profile.profile_photo.url }}" class="img-responsive" style="height: 80px; width: 80px;" alt="">
+                        {% else %}
+                        <img src="{% static 'images/default/user.jpg' %}" class="img-responsive" style="height: 80px; width: 80px;" alt="">
+                        {% endif %}
+                        <figcaption>{{request.user.first_name|upper}}&ensp;{{request.user.last_name|upper}}</figcaption>
+                        {% if orders %}
+                        <small><b>Shipping Address: </b>{{orders.shipping_address.shipping_street}}, 
+                            {{orders.shipping_address.shipping_state}},
+                            {{orders.shipping_address.shipping_lga}}.
+                        </small> 
+                        {% endif %}<br>
+                        <small>{{request.user.profile.phone_number}}</small>&ensp;|
+                        <small>{{request.user.email}}</small>&ensp;| 
+                        <small> <a href="{% url 'src:updateprofile' pk=profile.pk %}">Update Profile</a> </small>&ensp;|
+                    </td>
+                    <td >
+                          
+                    </td>
+                </tr>
+                </table>
+{% if orders %}
+    <h2>Order History</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            
+            <th scope="col">ORDER REF_CODE</th>
+            <th scope="col">ITEMS</th>            
+            <th scope="col">TOTAL QUANTITY</th>
+            <th scope="col">TOTAL AMOUNT</th>
+            <th scope="col">STATUS</th>
+        </tr>
+        </thead>
+
+        <tbody>       
+        <tr>           
+            <th scope="row">{{orders.ref_code}}</th> 
+            <td> {% for i in orders.items.all %}
+                [{{i.quantity}}]--{{i.item.name}}<br>
+           
+                {% endfor %} 
+             </td>   
+            <td>{{orders.get_total_quantity}}</td>
+            <td>{{orders.get_total}}</td>
+            <td>{{orders.status}}</td>            
+        </tr>      
+        </tbody>
+    </table>
+    {% else %}
+    <center>You have not made any order  <a href="/">Start now!</a> </center>
+    {% endif %}
+    </div>
+    </div>
+  </main>
+{% else %}
+<center class="h1">You are not suppose to be here</center>
+{% endif %}
 
 {% endblock content %}

@@ -3,5 +3,10 @@
 {% load crispy_forms_tags %}
 {% load widget_tweaks %}
 {% block content %}
-<h1>online</h1>
+
+
+<h1 class="text-center">online</h1>
+<center>
+    {% include 'djangorave/pay_button.html' with payment_model=pro_plan %}
+</center>
 {% endblock content %}

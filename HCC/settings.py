@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_countries',
     'tinymce',
-    'widget_tweaks', 
+    'widget_tweaks',
+    'djangorave', 
 ] 
 
 MIDDLEWARE = [
@@ -164,3 +165,11 @@ ACCOUNT_EMAIL_REQUIRED=True
 #stripe credentials
 STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY') 
 STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
+
+#Rave crrdentials
+RAVE_PRODUCTION_PUBLIC_KEY="your key"
+RAVE_PRODUCTION_SECRET_KEY="your key"
+RAVE_SANDBOX_PUBLIC_KEY="FLWPUBK_TEST-6651c5757e2c9f96a279e03f6c0d0a8d-X"
+RAVE_SANDBOX_SECRET_KEY="FLWSECK_TEST-f9e94dd1354aca709b84436e25fad23f-X"
+ENCRYPTION_KEY='FLWSECK_TESTe931f214cf09'
+RAVE_SANDBOX = True
